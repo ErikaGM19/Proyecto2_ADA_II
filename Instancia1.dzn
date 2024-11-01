@@ -1,0 +1,12 @@
+n = 10;  % Número total de personas
+m = 3;  % Número total de opiniones
+p = [6, 3, 1];  % Distribución inicial de personas
+v = [0.2, 0.5, 0.8];  % Valores asociados a las opiniones
+c_flat = [  % Matriz de costos de mover de una opinión a otra
+  0, 2, 4,
+  2, 0, 3,
+  4, 3, 0
+];
+ce = [1, 1, 2];  % Costos adicionales para mover a opiniones vacías
+ct = 15;  % Costo máximo total permitido
+maxM = 6;  % Número máximo de movimientos permitidos

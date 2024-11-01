@@ -1,0 +1,12 @@
+output ["\"output\": {","\"dzn\": ",showJSON(concat(["x = \n",let {array [int] of string: X_INTRODUCED_67_ = [], array [int] of string: X_INTRODUCED_68_ = [], array [int,int] of string: X_INTRODUCED_69_ = [(X_INTRODUCED_65_, X_INTRODUCED_66_) : showDzn(x[X_INTRODUCED_65_,X_INTRODUCED_66_]) | X_INTRODUCED_65_ in index_set_1of2(x), X_INTRODUCED_66_ in index_set_2of2(x)]} in (show2d_indexed(X_INTRODUCED_67_,X_INTRODUCED_68_,X_INTRODUCED_69_)),";\n","y = ",showDzn(y),";\n","cumulative_p = ",showDzn(cumulative_p),";\n","median_index = ",showDzn(median_index),";\n","median = ",showDzn(median),";\n","abs_diff = ",showDzn(abs_diff),";\n","_objective = ",showDzn(_objective),";\n"])),"}, \"sections\": [\"dzn\"]"];
+int: m = 3;
+array [1..m] of int: p = [6,3,1];
+array [1..m] of float: abs_diff = [-0.0,0.3,0.6000000000000001];
+float: polarization = sum([int2float(p[i])*abs_diff[i] | i in 1..m]);
+float: _objective = polarization;
+float: median = 0.2;
+int: median_index = 1;
+array [1..m] of int: cumulative_p = [6,9,10];
+array [1..m] of bool: y;
+array [1..9] of int: X_INTRODUCED_0_;
+array [1..m,1..m] of int: x = array2d(1..3,1..3,X_INTRODUCED_0_);
