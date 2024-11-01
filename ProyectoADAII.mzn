@@ -34,12 +34,11 @@ constraint forall(i in 2..m) (
 );
 
 % Encontrar el índice de la mediana
-var int: median_index = min(i in 1..m where cumulative_p[i] >= n div 2) (i);
+var int: median_index;
 constraint median_index = min(i in 1..m where cumulative_p[i] >= n div 2) (i);
 
-% Definir el valor de la mediana según el índice encontrado (restricción para determinar la mediana)
-var float: median;
-constraint median = sum(i in 1..m where i == median_index) (v[i]);
+% Definir el valor de la mediana según el índice encontrado
+var float: median = v[median_index];
 
 %-----------------------------------Polarización---------------------------------
 
@@ -49,7 +48,6 @@ constraint forall(i in 1..m) (
   abs_diff[i] = abs(v[i] - median)
 );
 var float: polarization = sum(i in 1..m) (p[i] * abs_diff[i]);
-
 
 %-----------------------------------Restricciones-----------------------------------
 
@@ -64,12 +62,14 @@ constraint forall(j in 1..m) (
   p[j] + sum(i in 1..m where i != j) (x[i, j]) - sum(i in 1..m where i != j) (x[j, i]) >= 0
 );
 
-
-% Restricción de Permanencia en Opiniones
+% Restricción de variable binaria y[i] para determinar si la opinión i recibe nuevas personas
 constraint forall(i in 1..m) (
-  y[i] = (sum(j in 1..m where j != i) (x[j, i]) > 0)
+  (sum(j in 1..m where j != i) (x[j, i]) > 0) -> (y[i] = true)
 );
 
+constraint forall(i in 1..m) (
+  (sum(j in 1..m where j != i) (x[j, i]) = 0) -> (y[i] = false)
+);
 
 % Restricción de No Negatividad
 constraint forall(i in 1..m, j in 1..m) (x[i, j] >= 0);
