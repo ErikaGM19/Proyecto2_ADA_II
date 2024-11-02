@@ -1,80 +1,101 @@
 % Analisis y Diseño de Algoritmos II
-% Proyecto 2: Minimización de la Polarizacion en una Poblacion
+% Proyecto 2: Minimización de la Polarización en una Población
 % Integrantes:
 % - Marcela Mazo Castro - 201843612
 % - Erika García Muñoz - 202259395
+
+include "globals.mzn";
 
 %-----------------------------------Parametros-----------------------------------
 
 % Entrada
 int: n;                           % Número total de personas
 int: m;                           % Número de posibles opiniones
-array[1..m] of int: p;            % Número de personas que tienen una opinión
-array[1..m] of float: v;          % Valor asociado a las opiniones , en el rango [0,1]
-array[1..m * m] of int: c_flat;   % Matriz de costos de cambios
-array[1..m] of int: ce;           % Costos adicionales de mover a una opinión i si estaba vacía
-int: ct;                          % Costo total máximo permitido
+array[1..m] of int: p;            % Distribución inicial de personas por opinión
+array[1..m] of float: v;          % Valor asociado a las opiniones, en el rango [0,1]
+array[1..m, 1..m] of float: c;    % Matriz de costos de cambios entre opiniones
+array[1..m] of float: ce;         % Costos adicionales de mover a una opinión inicialmente vacía
+float: ct;                        % Costo total máximo permitido
 int: maxM;                        % Número máximo de movimientos permitidos
 
-array[1..m, 1..m] of int: c = array2d(1..m, 1..m, c_flat);  % Definir la matriz de costos `c` a partir de la lista plana `c_flat`
 %-----------------------------------Variables-----------------------------------
 
 % Salida
 array[1..m, 1..m] of var 0..n: x;      % x[i,j]: Número de personas que cambian de la opinión i a la opinión j
-array[1..m] of var bool: y;            % y[i]: Indica si la opinión i es seleccionada para cambios (0 o 1)   
-array[1..m] of var int: cumulative_p;  % Distribución acumulativa de las opiniones
+array[1..m] of var bool: y;            % y[i]: Variable binaria, indica si la opinión i recibe personas (si estaba vacía)
+array[1..m] of var 0..n: p_new;        % Nueva distribución de personas por opinión después de los movimientos
 
+% Variable de polarización total
+var float: Z;  % Polarización total, con cota inferior de 0 (sin límite superior definido)
 
-%-----------------------------------Mediana-------------------------------------
+%-----------------------------------Cálculos-----------------------------------
 
-% Calcular la distribución acumulativa de las opiniones
-constraint cumulative_p[1] = p[1];
-constraint forall(i in 2..m) (
-    cumulative_p[i] = cumulative_p[i - 1] + p[i]
-);
-
-% Encontrar el índice de la mediana
-var int: median_index;
-constraint median_index = min(i in 1..m where cumulative_p[i] >= n div 2) (i);
-
-% Definir el valor de la mediana según el índice encontrado
-var float: median = v[median_index];
-
-%-----------------------------------Polarización---------------------------------
-
-% Calcula la polarización usando valor absoluto
-array[1..m] of var float: abs_diff;
+% Calcular la nueva distribución de personas, p_new, en función de los movimientos realizados
 constraint forall(i in 1..m) (
-  abs_diff[i] = abs(v[i] - median)
+    p_new[i] = p[i] + sum(j in 1..m where j != i)(x[j, i] - x[i, j])
 );
-var float: polarization = sum(i in 1..m) (p[i] * abs_diff[i]);
+
+% Cálculo de la suma acumulada de pesos (p_new en este caso)
+array[0..m] of var float: cum_p;  % Se cambia a var float para adaptarse a p_new
+constraint cum_p[0] = 0.0;
+constraint forall(i in 1..m) (
+    cum_p[i] = cum_p[i - 1] + int2float(p_new[i])
+);
+
+% Peso total (suma de todos los pesos)
+var float: W = cum_p[m];
+
+% Variable para el índice de la mediana ponderada
+var 1..m: k;
+
+% Restricciones para encontrar el índice de la mediana ponderada
+constraint cum_p[k] >= W / 2.0;
+constraint (k = 1) \/ (cum_p[k - 1] < W / 2.0);
+
+% Definición de la mediana ponderada
+var float: mediana = v[k];
+
+% Cálculo de la polarización total usando la mediana ponderada
+constraint Z = sum(i in 1..m) (int2float(p_new[i]) * abs(v[i] - mediana));
 
 %-----------------------------------Restricciones-----------------------------------
 
-% Restricción de costo total
-constraint sum(i in 1..m, j in 1..m where i != j) (c[i, j] * x[i, j]) + sum(i in 1..m) (ce[i] * bool2int(y[i])) <= ct;
+% 1. Restricción de Costo Total con el Factor Adicional
+constraint 
+    sum(i in 1..m, j in 1..m where i != j) (
+        c[i, j] * (1.0 + int2float(p[i]) / int2float(n)) * int2float(x[i, j])
+    ) + sum(i in 1..m)(
+        bool2int(y[i]) * ce[i]
+    ) <= ct;
 
-% Restricción de Movimiento Total
-constraint sum(i in 1..m, j in 1..m where i != j) (x[i, j]) <= maxM;
+% 2. Restricción de Movimientos Máximos (Usando Distancia entre Opiniones)
+constraint 
+    sum(i in 1..m, j in 1..m where i != j) (
+        abs(i - j) * x[i, j]
+    ) <= maxM;
 
-% Restricción de conservación de personas: el número de personas que cambian no puede exceder el total disponible
-constraint forall(j in 1..m) (
-  p[j] + sum(i in 1..m where i != j) (x[i, j]) - sum(i in 1..m where i != j) (x[j, i]) >= 0
-);
-
-% Restricción de variable binaria y[i] para determinar si la opinión i recibe nuevas personas
+% 3. Restricción de Selección de Opiniones (Manejo de Opiniones Vacías)
 constraint forall(i in 1..m) (
-  (sum(j in 1..m where j != i) (x[j, i]) > 0) -> (y[i] = true)
+    (p[i] = 0 /\ sum(j in 1..m where j != i)(x[j, i]) > 0) -> (y[i] = 1)
 );
-
 constraint forall(i in 1..m) (
-  (sum(j in 1..m where j != i) (x[j, i]) = 0) -> (y[i] = false)
+    (p[i] != 0 \/ sum(j in 1..m where j != i)(x[j, i]) = 0) -> (y[i] = 0)
 );
 
-% Restricción de No Negatividad
-constraint forall(i in 1..m, j in 1..m) (x[i, j] >= 0);
+% 4. Restricción de Conservación de Personas
+constraint sum(i in 1..m) (p_new[i]) = n;
 
 %-----------------------------------Funcion Objetivo-----------------------------------
 
-% Función objetivo: minimizar la polarización
-solve minimize polarization;
+% Resolver minimizando la polarización total
+solve minimize Z;
+
+%-----------------------------------Salida-----------------------------------
+
+output [
+    "La mediana ponderada es: ", show(mediana), "\n",
+    "Polarización total (suma de desviaciones absolutas ponderadas): ", show(Z), "\n",
+    "Nueva distribución de opiniones: ", show(p_new), "\n",
+    "Distribución de movimientos (x): ", show(x), "\n",
+    "Variables binarias (y): ", show(y), "\n"
+];

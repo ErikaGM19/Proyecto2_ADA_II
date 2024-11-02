@@ -2,11 +2,19 @@ n = 10;  % Número total de personas
 m = 3;  % Número total de opiniones
 p = [6, 3, 1];  % Distribución inicial de personas
 v = [0.2, 0.5, 0.8];  % Valores asociados a las opiniones
-c_flat = [  % Matriz de costos de mover de una opinión a otra
-  0, 2, 4,
-  2, 0, 3,
-  4, 3, 0
-];
-ce = [1, 1, 2];  % Costos adicionales para mover a opiniones vacías
-ct = 15;  % Costo máximo total permitido
+
+% Matriz de costos de mover de una opinión a otra (c), valores de tipo float
+c = array2d(1..m, 1..m, [
+    0.0, 2.0, 4.0,
+    2.0, 0.0, 3.0,
+    4.0, 3.0, 0.0
+]);
+
+
+% Costos adicionales para mover a opiniones vacías (ce), valores de tipo float
+ce = [1.0, 1.0, 2.0];
+
+% Costo máximo total permitido (ct), valor de tipo float
+ct = 15.0;
+
 maxM = 6;  % Número máximo de movimientos permitidos
