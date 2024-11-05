@@ -1,10 +1,10 @@
 output ["\"output\": {","\"default\": ",showJSON(concat(["La mediana ponderada es: ",show(mediana),"\n","Polarización total (suma de desviaciones absolutas ponderadas): ",show(Z),"\n","Nueva distribución de opiniones: ",show(p_new),"\n","Distribución de movimientos (x): ",show(x),"\n","Variables binarias (y): ",show(y),"\n"])),", \"raw\": ",showJSON(concat(["La mediana ponderada es: ",show(mediana),"\n","Polarización total (suma de desviaciones absolutas ponderadas): ",show(Z),"\n","Nueva distribución de opiniones: ",show(p_new),"\n","Distribución de movimientos (x): ",show(x),"\n","Variables binarias (y): ",show(y),"\n"])),"}, \"sections\": [\"default\", \"raw\"]"];
-int: m = 3;
+int: m = 10;
 array [1..m] of bool: y;
-array [1..9] of int: X_INTRODUCED_16_;
-array [1..m,1..m] of int: x = array2d(1..3,1..3,X_INTRODUCED_16_);
+array [1..100] of int: X_INTRODUCED_16_;
+array [1..m,1..m] of int: x = array2d(1..10,1..10,X_INTRODUCED_16_);
 array [1..m] of int: p_new;
 float: Z;
-array [1..m] of float: v = [0.2,0.5,0.8];
+array [1..m] of float: v = [0.1,0.15,0.25,0.4,0.6,0.7,0.8,0.85,0.9,0.95];
 int: k;
 float: mediana = v[k];

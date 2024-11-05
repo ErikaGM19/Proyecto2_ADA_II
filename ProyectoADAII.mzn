@@ -64,8 +64,7 @@ constraint Z = sum(i in 1..m) (int2float(p_new[i]) * abs(v[i] - mediana));
 constraint 
     sum(i in 1..m, j in 1..m where i != j) (
         c[i, j] * (1.0 + int2float(p[i]) / int2float(n)) * int2float(x[i, j])
-    ) + sum(i in 1..m)(
-        bool2int(y[i]) * ce[i]
+        + (p[j] = 0) * ce[j] * int2float(x[i, j])
     ) <= ct;
 
 % 2. Restricción de Movimientos Máximos (Usando Distancia entre Opiniones)
@@ -73,18 +72,26 @@ constraint
     sum(i in 1..m, j in 1..m where i != j) (
         abs(i - j) * x[i, j]
     ) <= maxM;
+    
+% 3. Restricción de Conservación de Personas
 
-% 3. Restricción de Selección de Opiniones (Manejo de Opiniones Vacías)
-constraint forall(i in 1..m) (
-    (p[i] = 0 /\ sum(j in 1..m where j != i)(x[j, i]) > 0) -> (y[i] = 1)
-);
-constraint forall(i in 1..m) (
-    (p[i] != 0 \/ sum(j in 1..m where j != i)(x[j, i]) = 0) -> (y[i] = 0)
-);
-
-% 4. Restricción de Conservación de Personas
 constraint sum(i in 1..m) (p_new[i]) = n;
 
+%4. Restricción de Capacidad de Movimiento
+
+constraint forall(i in 1..m) (
+          sum(j in 1..m where j != i)(x[i, j]) <= p[i]
+          );         
+
+%-----------------------------------Variables-----------------------------------
+
+% Variable de Selección de Opiniones 
+constraint 
+    sum(i in 1..m, j in 1..m where i != j) (
+            c[i, j] * (1.0 + int2float(p[i]) / int2float(n)) * int2float(x[i, j])
+            + (p[j] = 0) * ce[j] * int2float(x[i, j])
+        ) <= ct;
+        
 %-----------------------------------Funcion Objetivo-----------------------------------
 
 % Resolver minimizando la polarización total
