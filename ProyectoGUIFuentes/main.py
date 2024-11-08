@@ -30,7 +30,7 @@ def cargar_archivo(prueba):
             datos_entrada = archivo.readlines()  # Leer todas las líneas del archivo
             datos_entrada = [line.strip() for line in datos_entrada]  # Limpiar espacios en blanco
             contenido_dzn = mpl_to_dzn(datos_entrada, prueba.replace('.mpl', '.dzn'))
-            resultado_area.insert(ctk.END, f"Archivo '{prueba}' transformado y guardado exitosamente en: DatosProyecto/{prueba.replace('.mpl', '.dzn')}\n")
+            resultado_area.insert(ctk.END, f"Archivo '{prueba}' transformado y guardado exitosamente en: DatosProyecto/{prueba.replace(".mpl", ".dzn")}\n")
     except Exception as e:
         resultado_area.insert(ctk.END, f"Error al cargar la entrada: {str(e)}\n")
         return None
@@ -80,12 +80,10 @@ def ejecutar_minimizacion():
     try:
         # Ruta del archivo del modelo y archivo .dzn generado
         modelo_path = "Proyecto.mzn"
-        archivo_dzn_path = os.path.join("DatosProyecto", entrada_seleccionada.replace('.mpl', '.dzn'))
-        minizinc_path = r"C:\Program Files\MiniZinc\minizinc.exe"
+        archivo_dzn_path = os.path.join("DatosProyecto", entrada_seleccionada.replace(".mpl", ".dzn"))
         # Comando para ejecutar MiniZinc y capturar la salida
-        comando = [minizinc_path, "--solver", "gecode", "--all-solutions", modelo_path, archivo_dzn_path]
-        resultado = subprocess.run(comando, capture_output=True, text=True)
-
+        comando = f'minizinc --solver gecode --all-solutions {modelo_path} {archivo_dzn_path}'
+        resultado = subprocess.run(comando, shell=True, capture_output=True, text=True)
         
         # Mostrar el resultado en el área de texto
         if resultado.returncode == 0:
@@ -126,7 +124,7 @@ barra_superior = ctk.CTkFrame(root, height=105, corner_radius=0, fg_color="darkr
 barra_superior.grid(row=0, column=0, columnspan=3, sticky="ew")
 
 # Título
-titulo_label = ctk.CTkLabel(barra_superior, text="Minimizar la polarización en una población", font=("Montserrat", 24), text_color="white")
+titulo_label = ctk.CTkLabel(barra_superior, text="MINIMIZACIÓN DE LA POLARIZACIÓN EN UNA POBLACIÓN", font=("Montserrat", 20), text_color="white")
 titulo_label.place(relx=0.5, rely=0.5, anchor="center")  # Centrar el título
 
 # Cargar la imagen del logo
