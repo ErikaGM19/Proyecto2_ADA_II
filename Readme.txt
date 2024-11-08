@@ -14,7 +14,6 @@ Directorios y Archivos entregados:
 - Archivo ProyectoADAII.mzn
 - Archivo Informe.pdf  -----------PENDIENTE
 - Archivo Readme.txt  
-- Archivo README.md
 
 Requisitos del sistema:
 - tener Python instalado
