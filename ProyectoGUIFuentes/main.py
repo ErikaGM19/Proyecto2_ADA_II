@@ -30,7 +30,7 @@ def cargar_archivo(prueba):
             datos_entrada = archivo.readlines()  # Leer todas las líneas del archivo
             datos_entrada = [line.strip() for line in datos_entrada]  # Limpiar espacios en blanco
             contenido_dzn = mpl_to_dzn(datos_entrada, prueba.replace('.mpl', '.dzn'))
-            resultado_area.insert(ctk.END, f"Archivo '{prueba}' transformado y guardado exitosamente en: DatosProyecto/{prueba.replace(".mpl", ".dzn")}\n")
+            resultado_area.insert(ctk.END, f"Archivo '{prueba}' transformado y guardado exitosamente en: DatosProyecto/{prueba.replace('.mpl', '.dzn')}\n")
     except Exception as e:
         resultado_area.insert(ctk.END, f"Error al cargar la entrada: {str(e)}\n")
         return None
@@ -79,11 +79,13 @@ def ejecutar_minimizacion():
     global contenido_dzn
     try:
         # Ruta del archivo del modelo y archivo .dzn generado
-        modelo_path = "ProyectoADAII.mzn"
-        archivo_dzn_path = os.path.join("DatosProyecto", entrada_seleccionada.replace(".mpl", ".dzn"))
+        modelo_path = "Proyecto.mzn"
+        archivo_dzn_path = os.path.join("DatosProyecto", entrada_seleccionada.replace('.mpl', '.dzn'))
+        minizinc_path = r"C:\Program Files\MiniZinc\minizinc.exe"
         # Comando para ejecutar MiniZinc y capturar la salida
-        comando = f'minizinc --solver highs --all-solutions {modelo_path} {archivo_dzn_path}'
-        resultado = subprocess.run(comando, shell=True, capture_output=True, text=True)
+        comando = [minizinc_path, "--solver", "gecode", "--all-solutions", modelo_path, archivo_dzn_path]
+        resultado = subprocess.run(comando, capture_output=True, text=True)
+
         
         # Mostrar el resultado en el área de texto
         if resultado.returncode == 0:
