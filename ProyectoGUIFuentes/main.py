@@ -30,7 +30,7 @@ def cargar_archivo(prueba):
             datos_entrada = archivo.readlines()  # Leer todas las líneas del archivo
             datos_entrada = [line.strip() for line in datos_entrada]  # Limpiar espacios en blanco
             contenido_dzn = mpl_to_dzn(datos_entrada, prueba.replace('.mpl', '.dzn'))
-            resultado_area.insert(ctk.END, f"Archivo '{prueba}' transformado y guardado exitosamente en: DatosProyecto/{prueba.replace(".mpl", ".dzn")}\n")
+            resultado_area.insert(ctk.END, f"Archivo '{prueba}' transformado y guardado exitosamente en: DatosProyecto/{prueba.replace('.mpl', '.dzn')}\n")
             tabla = dibujar_tabla(datos_entrada);
             resultado_area.insert(ctk.END, f"\n{tabla}\n")
     except Exception as e:
@@ -90,7 +90,7 @@ def dibujar_tabla(datos):
 
         # Crear el encabezado de la tabla
         tabla = "+" + "-"*130 + "+\n"
-        tabla += f"|{" ":<62} Parámetros de entrada {" ":<68}|\n"
+        tabla += f"|{'':<62} Parámetros de entrada {'':<68}|\n"
         tabla += "+" + "-"*130 + "+\n"
         
         # Añadir filas con los datos
@@ -101,7 +101,7 @@ def dibujar_tabla(datos):
         tabla += f" Costo extra:            [{costo_extra}] \n"
         
         # Formatear la matriz de costos
-        matriz_str = f"\n{" ":<34} ".join(matriz_costos)
+        matriz_str = f'\n{" ":<34} '.join(matriz_costos)
         tabla += f" Matriz de costos:  [{matriz_str}] \n"
         
         tabla += f" Cantidad maxima de movimientos:         {max_movimientos} \n"
@@ -116,7 +116,7 @@ def ejecutar_minimizacion():
     try:
         # Ruta del archivo del modelo y archivo .dzn generado
         modelo_path = "Proyecto.mzn"
-        archivo_dzn_path = os.path.join("DatosProyecto", entrada_seleccionada.replace(".mpl", ".dzn"))
+        archivo_dzn_path = os.path.join("DatosProyecto", entrada_seleccionada.replace('.mpl', '.dzn'))
         # Comando para ejecutar MiniZinc y capturar la salida
         comando = f'minizinc --solver gecode --all-solutions {modelo_path} {archivo_dzn_path}'
         start_time = time.time()
@@ -127,7 +127,7 @@ def ejecutar_minimizacion():
         if resultado.returncode == 0:
             solucion = resultado.stdout.replace("Ã³","ó").replace("----------", "-"*132).replace("==========","="*75)
             titulo_resultado = "+" + "-"*130 + "+\n"
-            titulo_resultado += f"|{" ":<40} Resultado de la minimización para '{entrada_seleccionada}' {" ":<43}|\n"
+            titulo_resultado += f'|{" ":<40} Resultado de la minimización para "{entrada_seleccionada}" {" ":<43}|\n'
             titulo_resultado += "+" + "-"*130 + "+\n"
             resultado_area.insert(ctk.END, f"{titulo_resultado}\n{solucion}\n  Tiempo de ejecución: {execution_time}")
         else:
@@ -141,7 +141,7 @@ def obtener_entradas():
     carpeta_pruebas = "MisInstancias"
     try:
         # Listar los archivos .txt en la carpeta de pruebas
-        entradas_disponibles = [f for f in os.listdir(carpeta_pruebas) if f.endswith(".mpl")]
+        entradas_disponibles = [f for f in os.listdir(carpeta_pruebas) if f.endswith('.mpl')]
         if entradas_disponibles:
             entradas_disponibles = sorted(entradas_disponibles, key=lambda x: int(''.join(filter(str.isdigit, x))))
         else:

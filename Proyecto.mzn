@@ -22,7 +22,6 @@ int: maxM;                        % Número máximo de movimientos permitidos
 
 % Salida
 array[1..m, 1..m] of var 0..n: x;      % x[i,j]: Número de personas que cambian de la opinión i a la opinión j
-array[1..m] of var bool: y;            % y[i]: Variable binaria, indica si la opinión i recibe personas (si estaba vacía)
 array[1..m] of var 0..n: p_new;        % Nueva distribución de personas por opinión después de los movimientos
 
 % Variable de polarización total
@@ -82,16 +81,6 @@ constraint sum(i in 1..m) (p_new[i]) = n;
 constraint forall(i in 1..m) (
           sum(j in 1..m where j != i)(x[i, j]) <= p[i]
           );         
-
-%-----------------------------------Variables-----------------------------------
-
-% Variable de Selección de Opiniones 
-constraint 
-    sum(i in 1..m, j in 1..m where i != j) (
-            c[i, j] * (1.0 + int2float(p[i]) / int2float(n)) * int2float(x[i, j])
-            + (p[j] = 0) * ce[j] * int2float(x[i, j])
-        ) <= ct;
-        
 %-----------------------------------Funcion Objetivo-----------------------------------
 
 % Resolver minimizando la polarización total
@@ -104,5 +93,4 @@ output [
     "Polarización total (suma de desviaciones absolutas ponderadas): ", show(Z), "\n",
     "Nueva distribución de opiniones: ", show(p_new), "\n",
     "Distribución de movimientos (x): ", show(x), "\n",
-    "Variables binarias (y): ", show(y), "\n"
 ];
