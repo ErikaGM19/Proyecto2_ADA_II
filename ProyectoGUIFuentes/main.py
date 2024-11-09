@@ -31,6 +31,8 @@ def cargar_archivo(prueba):
             datos_entrada = [line.strip() for line in datos_entrada]  # Limpiar espacios en blanco
             contenido_dzn = mpl_to_dzn(datos_entrada, prueba.replace('.mpl', '.dzn'))
             resultado_area.insert(ctk.END, f"Archivo '{prueba}' transformado y guardado exitosamente en: DatosProyecto/{prueba.replace(".mpl", ".dzn")}\n")
+            tabla = dibujar_tabla(datos_entrada);
+            resultado_area.insert(ctk.END, f"\n{tabla}\n")
     except Exception as e:
         resultado_area.insert(ctk.END, f"Error al cargar la entrada: {str(e)}\n")
         return None
@@ -74,6 +76,40 @@ def mpl_to_dzn(datos, nombre_dzn):
         resultado_area.insert(ctk.END, f"Error en la transformación: {str(e)}\n")
         return ""
 
+# Funció para dibujar tabla
+def dibujar_tabla(datos):
+        
+        # Extraer los datos
+        num_personas = datos[0]
+        num_opiniones = datos[1]
+        personas_por_opinion = datos[2]
+        valor_opinion = datos[3]
+        costo_extra = datos[4]
+        matriz_costos = datos[5:5+int(num_opiniones)]
+        max_movimientos = datos[-1]
+
+        # Crear el encabezado de la tabla
+        tabla = "+" + "-"*130 + "+\n"
+        tabla += f"|{" ":<62} Parámetros de entrada {" ":<68}|\n"
+        tabla += "+" + "-"*130 + "+\n"
+        
+        # Añadir filas con los datos
+        tabla += f" Total personas:              {num_personas:<23} \n"
+        tabla += f" Cantidad de opiniones: {num_opiniones:<23} \n"
+        tabla += f" Cantidad de Personas por opinion: [{personas_por_opinion}]\n"
+        tabla += f" Valor por opinion:  [{valor_opinion}] \n"
+        tabla += f" Costo extra:            [{costo_extra}] \n"
+        
+        # Formatear la matriz de costos
+        matriz_str = f"\n{" ":<34} ".join(matriz_costos)
+        tabla += f" Matriz de costos:  [{matriz_str}] \n"
+        
+        tabla += f" Cantidad maxima de movimientos:         {max_movimientos} \n"
+        tabla += " -" + "-"*130 + "- \n"
+        
+        return tabla
+        
+    
 # Función para ejecutar el modelo MiniZinc    
 def ejecutar_minimizacion():
     global contenido_dzn
@@ -83,11 +119,17 @@ def ejecutar_minimizacion():
         archivo_dzn_path = os.path.join("DatosProyecto", entrada_seleccionada.replace(".mpl", ".dzn"))
         # Comando para ejecutar MiniZinc y capturar la salida
         comando = f'minizinc --solver gecode --all-solutions {modelo_path} {archivo_dzn_path}'
+        start_time = time.time()
         resultado = subprocess.run(comando, shell=True, capture_output=True, text=True)
-        
+        end_time = time.time()
+        execution_time = end_time - start_time  # Calcula el tiempo de ejecución
         # Mostrar el resultado en el área de texto
         if resultado.returncode == 0:
-            resultado_area.insert(ctk.END, f"Resultado de la minimización para '{entrada_seleccionada}':\n{resultado.stdout}\n")
+            solucion = resultado.stdout.replace("Ã³","ó").replace("----------", "-"*132).replace("==========","="*75)
+            titulo_resultado = "+" + "-"*130 + "+\n"
+            titulo_resultado += f"|{" ":<40} Resultado de la minimización para '{entrada_seleccionada}' {" ":<43}|\n"
+            titulo_resultado += "+" + "-"*130 + "+\n"
+            resultado_area.insert(ctk.END, f"{titulo_resultado}\n{solucion}\n  Tiempo de ejecución: {execution_time}")
         else:
             resultado_area.insert(ctk.END, f"Error en la minimización: {resultado.stderr}\n")
     except Exception as e:
@@ -118,9 +160,18 @@ def seleccionar_entrada(entrada):
     entrada_seleccionada = entrada
     resultado_area.insert(ctk.END, f"Entrada seleccionada: {entrada}\n")
     cargar_archivo(entrada)
+    btn_ejecutar_minimizacion.configure(state="normal", fg_color="#246c9c", hover_color="#2980b9")
     
+def limpiar():
+    resultado_area.delete("0.0", "end")
+    resultado_area.update()
+    opciones_pruebas.set("Seleccionar entrada")
+    entrada_seleccionada = None
+    contenido_dzn = ""
+    btn_ejecutar_minimizacion.configure(state="disabled")
+
 # Crear la barra superior roja con el título
-barra_superior = ctk.CTkFrame(root, height=105, corner_radius=0, fg_color="darkred")  
+barra_superior = ctk.CTkFrame(root, height=105, corner_radius=0, fg_color="#2c3e50")  
 barra_superior.grid(row=0, column=0, columnspan=3, sticky="ew")
 
 # Título
@@ -128,8 +179,8 @@ titulo_label = ctk.CTkLabel(barra_superior, text="MINIMIZACIÓN DE LA POLARIZACI
 titulo_label.place(relx=0.5, rely=0.5, anchor="center")  # Centrar el título
 
 # Cargar la imagen del logo
-logo_image = Image.open("ProyectoGUIFuentes/logoUV_gris.jpg")
-logo_image = logo_image.resize((95, 105))
+logo_image = Image.open("ProyectoGUIFuentes/logoUV_Rojo.jpg")
+logo_image = logo_image.resize((90, 105))
 logo_image_tk = ImageTk.PhotoImage(logo_image)
 
 # Mostrar la imagen del logo
@@ -137,10 +188,10 @@ logo_label = ctk.CTkLabel(barra_superior, image=logo_image_tk, text="")
 logo_label.grid(row=0, column=0, padx=0, pady=0)
 
 # Crear el área izquierda
-frame_resultados = ctk.CTkFrame(root, width=450, height=35, corner_radius=0, fg_color="gray30")
+frame_resultados = ctk.CTkFrame(root, width=450, height=35, corner_radius=0, fg_color="#2c3e50")
 frame_resultados.grid(row=1, column=0, rowspan=2, sticky="nswe")
 
-resultado_label = ctk.CTkLabel(frame_resultados, text="Resultado\nentradas minimizadas", font=("Montserrat", 10), text_color="white", justify="center")
+resultado_label = ctk.CTkLabel(frame_resultados, text="Resultado\nentradas minimizadas", font=("Montserrat", 9), text_color="white", justify="center")
 resultado_label.grid(row=0, column=0, pady=10)
 
 # Crear el área principal de contenido
@@ -149,7 +200,7 @@ frame_contenido.grid(row=1, column=1, sticky="ew", padx=10, pady=10)
 
 # Título dentro del contenido
 label_seleccion = ctk.CTkLabel(frame_contenido, text="Seleccione una entrada a minimizar", font=("Montserrat", 20))
-label_seleccion.grid(row=0, column=0, pady=10, sticky="ew")
+label_seleccion.grid(row=0, column=0, pady=5, sticky="ew")
 
 # Crear un marco para alinear los menús desplegables de forma horizontal
 frame_menus_botones = ctk.CTkFrame(frame_contenido, fg_color="gray25")
@@ -164,9 +215,9 @@ opciones_pruebas = ctk.CTkOptionMenu(
     frame_menus_botones,
     values=["Seleccionar entrada"],
     command=seleccionar_entrada,  # Llama a seleccionar_prueba cuando se selecciona una prueba
-    fg_color="darkred",
-    button_color="darkred",
-    button_hover_color="#c71818"
+    fg_color="#246c9c",
+    button_color="#246c9c",
+    button_hover_color="#2980b9"
 )
 opciones_pruebas.grid(row=0, column=0, padx=10)
 
@@ -174,21 +225,22 @@ opciones_pruebas.grid(row=0, column=0, padx=10)
 btn_ejecutar_minimizacion = ctk.CTkButton(
     frame_menus_botones,
     text="Minimizar",
-    fg_color="darkred",
-    hover_color="darkred",
+    fg_color="#246c9c",
+    hover_color="#2980b9",
+    state="disabled",
     command=ejecutar_minimizacion  
 )
 btn_ejecutar_minimizacion.grid(row=0, column=2, padx=10)
 
 # Botón de "Detener ejecución"
-btn_detener_ejecucion = ctk.CTkButton(
+btn_limpiar = ctk.CTkButton(
     frame_menus_botones,
-    text="Detener ejecución",
-    fg_color="darkred",
-    hover_color="darkred",
-    command=lambda: resultado_area.insert(ctk.END, "Ejecución detenida\n")
+    text="Limpiar",
+    fg_color="#246c9c",
+    hover_color="#2980b9",
+    command=limpiar
 )
-btn_detener_ejecucion.grid(row=0, column=3, padx=10)
+btn_limpiar.grid(row=0, column=3, padx=10)
 
 # Crear el área para mostrar el resultado de la ejecución
 frame_resultado = ctk.CTkFrame(root, fg_color="gray25", width=150, height=400)
