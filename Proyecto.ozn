@@ -1,10 +1,7 @@
-output ["\"output\": {","\"default\": ",showJSON(concat(["La mediana ponderada es: ",show(mediana),"\n","Polarización total (suma de desviaciones absolutas ponderadas): ",show(Z),"\n","Nueva distribución de opiniones: ",show(p_new),"\n","Distribución de movimientos (x): ",show(x),"\n","Variables binarias (y): ",show(y),"\n"])),", \"raw\": ",showJSON(concat(["La mediana ponderada es: ",show(mediana),"\n","Polarización total (suma de desviaciones absolutas ponderadas): ",show(Z),"\n","Nueva distribución de opiniones: ",show(p_new),"\n","Distribución de movimientos (x): ",show(x),"\n","Variables binarias (y): ",show(y),"\n"])),"}, \"sections\": [\"default\", \"raw\"]"];
-int: m = 6;
-array [1..m] of bool: y;
-array [1..36] of int: X_INTRODUCED_16_;
-array [1..m,1..m] of int: x = array2d(1..6,1..6,X_INTRODUCED_16_);
+output ["\"output\": {","\"default\": ",showJSON(concat(["La mediana ponderada es: ",show(mediana),"\n","Polarización total (suma de desviaciones absolutas ponderadas): ",show(Z),"\n","Nueva distribución de opiniones: ",show(p_new),"\n","Distribución de movimientos (x): ",show(x),"\n"])),", \"raw\": ",showJSON(concat(["La mediana ponderada es: ",show(mediana),"\n","Polarización total (suma de desviaciones absolutas ponderadas): ",show(Z),"\n","Nueva distribución de opiniones: ",show(p_new),"\n","Distribución de movimientos (x): ",show(x),"\n"])),"}, \"sections\": [\"default\", \"raw\"]"];
+int: m = 10;
+array [1..100] of int: X_INTRODUCED_16_;
+array [1..m,1..m] of int: x = array2d(1..10,1..10,X_INTRODUCED_16_);
 array [1..m] of int: p_new;
 float: Z;
-array [1..m] of float: v = [0.0,0.2,0.4,0.6,0.8,1.0];
-int: k;
-float: mediana = v[k];
+float: mediana;
