@@ -5,7 +5,7 @@ Integrantes:
  - Marcela Mazo Castro - 201843612
  - Erika García Muñoz - 202259395
 
-Video Explicativo: ---------------PENDIENTE
+Video Explicativo: https://youtu.be/ZfTdVboag4k
 
 Directorios y Archivos entregados:
 - Carpeta DatosProyecto
@@ -21,9 +21,9 @@ Requisitos del sistema:
 - tener MiniZinc instalado y configurado en PATH en variables del sistema
 
 Ejecución de la Aplicación:
-- Abrir el archivo de la aplicación con un IDE preferiblemente Visual Studio Code.
+- Abrir el archivo de la aplicación con un IDE preferiblemente Visual Studio Code, desde la raiz "Proyecto2_ADA_II".
 - Entrar a la carpeta ProyectoGUIFuentes.
 - Ejecutar el archivo main.py
 - Presionar el desplegable "Seleccionar entrada" y seleccionar una prueba en formato mpl de la carpeta MisInstancias.
-- Al cargar el archivo .mpl inmediatamente se transforma y se guarda en DatosProyecto
+- Al cargar el archivo .mpl inmediatamente se transforma a .dzn y se guarda en DatosProyecto
 - Presionar el boton "Minimizar" para visualizar las respuestas.
