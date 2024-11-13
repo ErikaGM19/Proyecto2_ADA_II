@@ -1,4 +1,4 @@
-% Analisis y Diseño de Algoritmos II
+  % Analisis y Diseño de Algoritmos II
 % Proyecto 2: Minimización de la Polarización en una Población
 % Integrantes:
 % - Marcela Mazo Castro - 201843612

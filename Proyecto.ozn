@@ -1,7 +1,7 @@
 output ["\"output\": {","\"default\": ",showJSON(concat(["La mediana ponderada es: ",show(mediana),"\n","Polarización total (suma de desviaciones absolutas ponderadas): ",show(Z),"\n","Nueva distribución de opiniones: ",show(p_new),"\n","Distribución de movimientos (x): ",show(x),"\n"])),", \"raw\": ",showJSON(concat(["La mediana ponderada es: ",show(mediana),"\n","Polarización total (suma de desviaciones absolutas ponderadas): ",show(Z),"\n","Nueva distribución de opiniones: ",show(p_new),"\n","Distribución de movimientos (x): ",show(x),"\n"])),"}, \"sections\": [\"default\", \"raw\"]"];
-int: m = 10;
-array [1..100] of int: X_INTRODUCED_16_;
-array [1..m,1..m] of int: x = array2d(1..10,1..10,X_INTRODUCED_16_);
+int: m = 5;
+array [1..25] of int: X_INTRODUCED_16_;
+array [1..m,1..m] of int: x = array2d(1..5,1..5,X_INTRODUCED_16_);
 array [1..m] of int: p_new;
 float: Z;
 float: mediana;
